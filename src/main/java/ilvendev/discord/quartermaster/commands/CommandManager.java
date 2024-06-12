@@ -1,6 +1,5 @@
 package ilvendev.discord.quartermaster.commands;
 
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -18,22 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandManager extends ListenerAdapter {
-
-    private Modal createTestModal(){
-        TextInput subject = TextInput.create("subject", "Subject", TextInputStyle.SHORT)
-                .setPlaceholder("Subject of this ticket")
-                .build();
-
-        TextInput body = TextInput.create("body", "Body", TextInputStyle.PARAGRAPH)
-                .setPlaceholder("Your concerns go here")
-                .build();
-
-        Modal modal = Modal.create("modmail", "Modmail")
-                .addComponents(ActionRow.of(subject), ActionRow.of(body))
-                .build();
-
-        return modal;
-    }
 
     private Modal arrestModal(){
 
