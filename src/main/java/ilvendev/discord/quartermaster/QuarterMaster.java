@@ -10,8 +10,6 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 
 public class QuarterMaster {
 
-
-
     private final Dotenv config;
     private final ShardManager shardManager;
 

@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 
 import java.util.List;
 
-public class CommandModalManager {
+public class ActivityModals {
 
     public static Modal createArrestModal(){
 

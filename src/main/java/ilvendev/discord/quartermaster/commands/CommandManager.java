@@ -21,10 +21,11 @@ public class CommandManager extends ListenerAdapter {
         put("arrest", "Open an arrest modal");
         put("ranks", "Open a ranks modal");
         put("excuses", "Open an excuses modal");
+        put("createschedule", "Create a new schedule embed");
     }};
 
     @Override
-    public void onGuildReady(@NotNull  GuildReadyEvent event) {
+    public void onGuildReady(@NotNull GuildReadyEvent event) {
         List<CommandData> commandData = new ArrayList<>();
         commands.forEach((name, description) -> {
             commandData.add(Commands.slash(name, description));
@@ -47,13 +48,18 @@ public class CommandManager extends ListenerAdapter {
         Modal modal;
         switch (command){
             case "arrest":
-                event.replyModal(CommandModalManager.createArrestModal()).queue();
+                event.replyModal(ActivityModals.createArrestModal()).queue();
                 break;
             case "ranks":
-                event.replyModal(CommandModalManager.createRanksModal()).queue();
+                event.replyModal(ActivityModals.createRanksModal()).queue();
                 break;
             case "excuses":
-                event.replyModal(CommandModalManager.createExcusesModal()).queue();
+                event.replyModal(ActivityModals.createExcusesModal()).queue();
+                break;
+            case "createschedule":
+                Schedule schedule = new Schedule();
+                event.getChannel().sendMessageEmbeds(schedule.createScheduleEmbed()).queue();
+                event.reply("Schedule created").setEphemeral(true).queue();
                 break;
         }
 
@@ -61,28 +67,26 @@ public class CommandManager extends ListenerAdapter {
 
     @Override
     public void onModalInteraction(@NotNull ModalInteractionEvent event) {
-        String modalName = event.getModalId();
-        String username = !(event.getMember().getNickname() == null) ? event.getMember().getNickname() : event.getUser().getEffectiveName();
-        switch (modalName){
+        String username = event.getMember().getNickname() != null ? event.getMember().getNickname() : event.getUser().getEffectiveName();
+        switch (event.getModalId()){
             case "arrestModal":
                 List<ModalMapping> arrestValues = event.getValues();
 
-                event.getChannel().sendMessageEmbeds(CommandModalManager.createArrestAnswerEmbed(arrestValues)).queue();
+                event.getChannel().sendMessageEmbeds(ActivityModals.createArrestAnswerEmbed(arrestValues)).queue();
                 event.reply("Twój areszt został przyjęty").setEphemeral(true).queue();
 
                 break;
             case "ranksModal":
                 List<ModalMapping> ranksValues = event.getValues();
 
-                event.getChannel().sendMessageEmbeds(CommandModalManager.createRanksAnswerEmbed(username, ranksValues)).queue();;
+                event.getChannel().sendMessageEmbeds(ActivityModals.createRanksAnswerEmbed(username, ranksValues)).queue();;
                 event.reply("Twój stopień został zmieniony").setEphemeral(true).queue();
                 break;
             case "excusesModal":
                 List<ModalMapping> excusesValues = event.getValues();
 
-                event.getChannel().sendMessageEmbeds(CommandModalManager.createExcuseAnswerEmbed(username, excusesValues)).queue();
+                event.getChannel().sendMessageEmbeds(ActivityModals.createExcuseAnswerEmbed(username, excusesValues)).queue();
                 event.reply("Twoje zwolnienie zostało wysłane").setEphemeral(true).queue();
-
                 break;
         }
     }
