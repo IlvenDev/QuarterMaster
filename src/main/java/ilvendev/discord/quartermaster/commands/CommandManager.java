@@ -7,57 +7,28 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class CommandManager extends ListenerAdapter {
 
-    private Modal arrestModal(){
-
-        TextInput arrestedPeople = TextInput.create("arrestedPeople", "Aresztowani", TextInputStyle.SHORT)
-                .setPlaceholder("Kogo aresztowałeś")
-                .build();
-
-        TextInput arrestingOfficer = TextInput.create("arrestingOfficer", "Aresztujący", TextInputStyle.SHORT)
-                .setPlaceholder("Kto aresztuje")
-                .build();
-
-        TextInput reasons = TextInput.create("reasons", "Powód aresztu", TextInputStyle.PARAGRAPH)
-                .setPlaceholder("Za co aresztowany")
-                .build();
-
-        TextInput punishment = TextInput.create("punishment", "Wymiar kary", TextInputStyle.SHORT)
-                .setPlaceholder("Jaką karę otrzymał")
-                .build();
-
-        TextInput branch = TextInput.create("branch", "Przynależnośc oddziałowa", TextInputStyle.SHORT)
-                .setPlaceholder("SZTAB | SAS | 43rd | 24th | MP")
-                .build();
-
-        Modal modal = Modal.create("arrestModal", "Arrest")
-                .addComponents(
-                        ActionRow.of(arrestedPeople),
-                        ActionRow.of(arrestingOfficer),
-                        ActionRow.of(reasons),
-                        ActionRow.of(punishment),
-                        ActionRow.of(branch))
-                .build();
-
-        return modal;
-    }
+    private final HashMap<String, String> commands = new HashMap<String, String >() {{
+        put("arrest", "Open an arrest modal");
+        put("ranks", "Open a ranks modal");
+        put("excuses", "Open an excuses modal");
+    }};
 
     @Override
     public void onGuildReady(@NotNull  GuildReadyEvent event) {
         List<CommandData> commandData = new ArrayList<>();
-        commandData.add(Commands.slash("tester", "return tester + userName"));
-        commandData.add(Commands.slash("roles", "return role list"));
-        commandData.add(Commands.slash("arrest", "open an arrest modal"));
+        commands.forEach((name, description) -> {
+            commandData.add(Commands.slash(name, description));
+        });
         event.getGuild().updateCommands().addCommands(commandData).queue();
     }
 
@@ -69,28 +40,40 @@ public class CommandManager extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         String command = event.getName();
-        if (command.equals("arrest")) {
-            Modal modal = arrestModal();
-            event.replyModal(modal).queue();
+        Modal modal;
+        switch (command){
+            case "arrest":
+                event.replyModal(CommandModalManager.createArrestModal()).queue();
+                break;
+            case "ranks":
+                event.replyModal(CommandModalManager.createRanksModal()).queue();
+                break;
+            case "excuses":
+                event.replyModal(CommandModalManager.createExcusesModal()).queue();
+                break;
         }
+
     }
 
     @Override
     public void onModalInteraction(@NotNull ModalInteractionEvent event) {
-        if (event.getModalId().equals("arrestModal")) {
-            String arrestedPeople = String.valueOf(event.getValue("arrestedPeople"));
-            String arrestingOfficer = String.valueOf(event.getValue("arrestingOfficer"));
-            String reasons = String.valueOf(event.getValue("reasons"));
-            String punishment = String.valueOf(event.getValue("punishment"));
-            String branch = String.valueOf(event.getValue("branch"));
+        String modalName = event.getModalId();
+        String username = event.getUser().getName();
+        switch (modalName){
+            case "arrestModal":
+                List<ModalMapping> modalValues = event.getValues();
 
-            System.out.println(arrestedPeople);
-            System.out.println(arrestingOfficer);
-            System.out.println(reasons);
-            System.out.println(punishment);
-            System.out.println(branch);
+                event.reply("Twój areszt został przyjęty").setEphemeral(true).queue();
+                event.getChannel().sendMessageEmbeds(CommandModalManager.createArrestAnswerEmbed(username, modalValues)).queue();
 
-            event.reply("Your arrest has been accepted").setEphemeral(true).queue();
+                break;
+            case "ranksModal":
+                event.reply("Your rank has been changed").setEphemeral(true).queue();
+                break;
+            case "excusesModal":
+                event.reply("Your excuse has been sent").setEphemeral(true).queue();
+
+                break;
         }
     }
 }
