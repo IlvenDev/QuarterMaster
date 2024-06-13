@@ -34,7 +34,11 @@ public class CommandManager extends ListenerAdapter {
 
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
-      // Same as in onGuildReady
+        List<CommandData> commandData = new ArrayList<>();
+        commands.forEach((name, description) -> {
+            commandData.add(Commands.slash(name, description));
+        });
+        event.getGuild().updateCommands().addCommands(commandData).queue();
     }
 
     @Override
@@ -58,20 +62,26 @@ public class CommandManager extends ListenerAdapter {
     @Override
     public void onModalInteraction(@NotNull ModalInteractionEvent event) {
         String modalName = event.getModalId();
-        String username = event.getUser().getName();
+        String username = !(event.getMember().getNickname() == null) ? event.getMember().getNickname() : event.getUser().getEffectiveName();
         switch (modalName){
             case "arrestModal":
-                List<ModalMapping> modalValues = event.getValues();
+                List<ModalMapping> arrestValues = event.getValues();
 
+                event.getChannel().sendMessageEmbeds(CommandModalManager.createArrestAnswerEmbed(arrestValues)).queue();
                 event.reply("Twój areszt został przyjęty").setEphemeral(true).queue();
-                event.getChannel().sendMessageEmbeds(CommandModalManager.createArrestAnswerEmbed(username, modalValues)).queue();
 
                 break;
             case "ranksModal":
-                event.reply("Your rank has been changed").setEphemeral(true).queue();
+                List<ModalMapping> ranksValues = event.getValues();
+
+                event.getChannel().sendMessageEmbeds(CommandModalManager.createRanksAnswerEmbed(username, ranksValues)).queue();;
+                event.reply("Twój stopień został zmieniony").setEphemeral(true).queue();
                 break;
             case "excusesModal":
-                event.reply("Your excuse has been sent").setEphemeral(true).queue();
+                List<ModalMapping> excusesValues = event.getValues();
+
+                event.getChannel().sendMessageEmbeds(CommandModalManager.createExcuseAnswerEmbed(username, excusesValues)).queue();
+                event.reply("Twoje zwolnienie zostało wysłane").setEphemeral(true).queue();
 
                 break;
         }

@@ -83,8 +83,7 @@ public class CommandModalManager {
                 .build();
     }
 
-    public static MessageEmbed createArrestAnswerEmbed(String username, List<ModalMapping> modalValues){
-
+    public static MessageEmbed createArrestAnswerEmbed(List<ModalMapping> modalValues){
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("Przyjęto areszt");
         embed.setDescription(
@@ -92,8 +91,32 @@ public class CommandModalManager {
                 + "Aresztujący: " + modalValues.get(1).getAsString() + "\n"
                 + "Powód: " + modalValues.get(2).getAsString() + "\n"
                 + "Wymiar kary: " + modalValues.get(3).getAsString() + "\n"
-                + "Przynależność oddziałowa: " + modalValues.get(4).getAsString());
+                + "Przynależność oddziałowa: " + modalValues.get(4).getAsString()
+        );
         embed.setColor(0xdb0404);
+        return embed.build();
+    }
+
+    public static MessageEmbed createRanksAnswerEmbed(String username, List<ModalMapping> modalValues){
+        EmbedBuilder embed = new EmbedBuilder();
+        embed.setTitle("Zmiana stopnia " + username);
+        embed.setDescription(
+                "Obecny stopień: " + modalValues.get(0).getAsString() + "\n"
+                + "Nowy stopień: " + modalValues.get(1).getAsString() + "\n"
+                + "Nadający awans: " + modalValues.get(2).getAsString() + "\n"
+        );
+        embed.setColor(0x00bf00);
+        return embed.build();
+    }
+
+    public static MessageEmbed createExcuseAnswerEmbed(String username, List<ModalMapping> modalValues){
+        EmbedBuilder embed = new EmbedBuilder();
+        embed.setTitle("Zwolnienie " + username);
+        embed.setDescription(
+                "Termin zwolnienia: " + modalValues.get(0).getAsString() + "\n"
+                + "Powód zwolnienia: " + modalValues.get(1).getAsString() + "\n"
+        );
+        embed.setColor(0x00bf00);
         return embed.build();
     }
 }
