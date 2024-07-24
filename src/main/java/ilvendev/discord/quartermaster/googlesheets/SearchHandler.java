@@ -1,19 +1,16 @@
 package ilvendev.discord.quartermaster.googlesheets;
 
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.util.List;
-import java.util.Objects;
 
 public class SearchHandler {
+    private static final String spreadsheetId = "1hi_Mrz1vTPcF6tLH_qPOWKrSXKzo5ZH6W9hMsP3J8QQ";
 
-    public static int findColumnNumberByName(String name, String searchRange) throws Exception {
-        Sheets service = null;
-        String spreadsheetId = "1hi_Mrz1vTPcF6tLH_qPOWKrSXKzo5ZH6W9hMsP3J8QQ";
+    public static String findColumnByName(String name, String searchRange) {
+        int columnLetter = (int) 'A';
         try {
-            service = Auth.createSheetsService("Column number finder");
-
+            Sheets service = Auth.createSheetsService("Column number finder");
             List<Object> values = service.spreadsheets().values()
                     .get(spreadsheetId, searchRange)
                     .execute()
@@ -22,7 +19,30 @@ public class SearchHandler {
 
             for (int i = 0; i < values.size(); i++) {
                 if (name.equals(values.get(i).toString())) {
-                    return i;
+                    return Character.toString(columnLetter + i);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Could not create sheets service");
+        }
+
+        return "No such column";
+    }
+
+    public static int findRowNumberByName(String name, String column) {
+        String range = column + "2:" + column;
+        try {
+            Sheets service = Auth.createSheetsService("Column number finder");
+            List<Object> values = service.spreadsheets().values()
+                    .get(spreadsheetId, range)
+                    .setMajorDimension("COLUMNS")
+                    .execute()
+                    .getValues()
+                    .getFirst();
+
+            for (int i = 0; i < values.size(); i++) {
+                if (name.equals(values.get(i).toString())) {
+                    return i+1;
                 }
             }
         } catch (Exception e) {
@@ -30,10 +50,12 @@ public class SearchHandler {
         }
 
         return -1;
-    };
+    }
 
-    public static void main(String[] args) throws Exception {
-        int columnNumber = findColumnNumberByName("Imię i nazwisko", "A1:L1");
-        System.out.println(columnNumber);
+    public static void main(String[] args) {
+        String column = findColumnByName("Imię i nazwisko", "A1:L1");
+        System.out.println(column);
+        int row = findRowNumberByName("Jacob Reglan", column);
+        System.out.println(row);
     }
 }
