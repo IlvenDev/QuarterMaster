@@ -15,6 +15,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.util.store.FileDataStoreFactory;
 
 import java.io.*;
+import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,20 +49,10 @@ public class Auth {
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
-    public static void main(String[] args) throws Exception {
+    public static Sheets createSheetsService(String APPLICATION_NAME) throws GeneralSecurityException, IOException, Exception {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        final String spreadsheetId = "1hi_Mrz1vTPcF6tLH_qPOWKrSXKzo5ZH6W9hMsP3J8QQ";
-        final String range = "D2:D";
-
-        Sheets service =
-                new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                        .setApplicationName(APPLICATION_NAME)
-                        .build();
-
-        ValueRange values = service.spreadsheets().values()
-                .get(spreadsheetId, range)
-                .execute();
-
-        System.out.println(values.getValues());
-    }
+        return new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+    };
 }
