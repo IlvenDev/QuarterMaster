@@ -10,7 +10,7 @@ public class SearchHandler {
     public static String findColumnByName(String name, String searchRange) {
         int columnLetter = (int) 'A';
         try {
-            Sheets service = Auth.createSheetsService("Column number finder");
+            Sheets service = Auth.createSheetsService("Column  finder");
             List<Object> values = service.spreadsheets().values()
                     .get(spreadsheetId, searchRange)
                     .execute()
@@ -24,15 +24,16 @@ public class SearchHandler {
             }
         } catch (Exception e) {
             System.out.println("Could not create sheets service");
+            e.printStackTrace();
         }
 
         return "No such column";
     }
 
-    public static int findRowNumberByName(String name, String column) {
+    public static String findRowNumberByName(String name, String column) {
         String range = column + "2:" + column;
         try {
-            Sheets service = Auth.createSheetsService("Column number finder");
+            Sheets service = Auth.createSheetsService("Row number finder");
             List<Object> values = service.spreadsheets().values()
                     .get(spreadsheetId, range)
                     .setMajorDimension("COLUMNS")
@@ -42,20 +43,21 @@ public class SearchHandler {
 
             for (int i = 0; i < values.size(); i++) {
                 if (name.equals(values.get(i).toString())) {
-                    return i+1;
+                    return Integer.toString(i+2);
                 }
             }
         } catch (Exception e) {
             System.out.println("Could not create sheets service");
+            e.printStackTrace();
         }
 
-        return -1;
+        return "";
     }
 
     public static void main(String[] args) {
         String column = findColumnByName("Imię i nazwisko", "A1:L1");
         System.out.println(column);
-        int row = findRowNumberByName("Jacob Reglan", column);
+        String row = findRowNumberByName("Jacob Reglan", column);
         System.out.println(row);
     }
 }

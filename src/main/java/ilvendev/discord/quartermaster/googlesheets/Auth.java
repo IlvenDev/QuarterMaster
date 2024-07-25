@@ -44,7 +44,7 @@ public class Auth {
                 .setAccessType("offline")
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("dev");
+        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("Dev");
     }
 
     public static Sheets createSheetsService(String APPLICATION_NAME) throws GeneralSecurityException, IOException, Exception {
