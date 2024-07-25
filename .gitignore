@@ -18,4 +18,4 @@ buildNumber.properties
 # Dotenv-specific
 .env
 # Google credentials
-resources/credentials.json
+*/resources/
