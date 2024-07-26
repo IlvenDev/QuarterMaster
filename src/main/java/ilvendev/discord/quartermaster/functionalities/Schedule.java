@@ -1,4 +1,4 @@
-package ilvendev.discord.quartermaster.commands;
+package ilvendev.discord.quartermaster.functionalities;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;

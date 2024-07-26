@@ -8,7 +8,6 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.auth.oauth2.Credential;
@@ -19,10 +18,18 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 
-public class Auth {
-    private static final String APPLICATION_NAME = "Google Sheets Authentication";
+public class SheetsSetup {
+    private static  String spreadsheetId = "";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
+
+    public static void setSpreadsheetId(String newSpreadsheetId) {
+        spreadsheetId = newSpreadsheetId;
+    }
+
+    public static String getSpreadsheetId() {
+        return spreadsheetId;
+    }
 
     private static final List<String> SCOPES =
             Collections.singletonList(SheetsScopes.SPREADSHEETS);
@@ -31,7 +38,7 @@ public class Auth {
 
     public static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
             throws Exception {
-        InputStream in = Auth.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        InputStream in = SheetsSetup.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
             throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
         }
@@ -54,3 +61,4 @@ public class Auth {
                 .build();
     };
 }
+

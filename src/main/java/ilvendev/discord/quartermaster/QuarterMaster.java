@@ -5,6 +5,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
 
@@ -17,10 +18,10 @@ public class QuarterMaster {
         config = Dotenv.configure().load();
         String token = config.get("TOKEN");
 
-        DefaultShardManagerBuilder builder = DefaultShardManagerBuilder.createDefault(token);
-        builder.setStatus(OnlineStatus.ONLINE);
-        builder.setActivity(Activity.playing("Quarter Master"));
-        shardManager = builder.build();
+       shardManager = DefaultShardManagerBuilder.createDefault(token)
+               .setStatus(OnlineStatus.ONLINE)
+               .setActivity(Activity.playing("Google Sheets"))
+               .build();
 
         shardManager.addEventListener(new CommandManager());
     }
@@ -34,7 +35,6 @@ public class QuarterMaster {
     }
 
     public static void main(String[] args) {
-        System.out.println();
         try {
             QuarterMaster bot = new QuarterMaster();
         } catch (InvalidTokenException e) {
