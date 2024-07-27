@@ -3,6 +3,7 @@ package ilvendev.discord.quartermaster.commands;
 import ilvendev.discord.quartermaster.functionalities.FunctionalityModals;
 import ilvendev.discord.quartermaster.functionalities.ScheduleHandler;
 import ilvendev.discord.quartermaster.googlesheets.SheetsSetup;
+import ilvendev.discord.quartermaster.googlesheets.WritingHandler;
 import ilvendev.discord.quartermaster.userManagement.UserManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -34,15 +35,23 @@ public class CommandManager extends ListenerAdapter {
         commandData.add((Commands.slash("createschedule", "Create a new schedule")));
         commandData.add((Commands.slash("changeschedule", "Change a day in the schedule"))
                 .addOptions(new OptionData(OptionType.STRING, "day", "Day which description to change")
-                        .addChoice("Poniedziałek", "poniedziałek")
-                        .addChoice("Wtorek", "wtorek")
-                        .addChoice("Środa", "środa")
-                        .addChoice("Czwartek", "czwartek")
-                        .addChoice("Piątek", "piątek"))
+                        .addChoice("Monday", "monday")
+                        .addChoice("Tuesday", "tuesday")
+                        .addChoice("Wednesday", "wednesday")
+                        .addChoice("Thursday", "thursday")
+                        .addChoice("Friday", "friday")
+                        .addChoice("Saturday", "saturday")
+                        .addChoice("Sunday", "sunday"))
                         .addOption(OptionType.STRING, "description", "New day description"));
         commandData.add((Commands.slash("setupusers", "Sets up user data")));
         commandData.add(Commands.slash("setup", "Sets up sheets to discord connection")
-                .addOption(OptionType.STRING, "spreadsheet", "ID of your spreadsheet", true));
+                .addOption(OptionType.STRING, "spreadsheet", "ID of your spreadsheet", true)
+                .addOption(OptionType.STRING, "idcolumn", "Column in which discord user IDs are stored", true)
+                .addOption(OptionType.STRING, "rankcolumn", "Column in which your ranks are stored", true)
+                .addOption(OptionType.STRING, "excusecolumn", "Column in which your excuses are stored", true)
+                .addOption(OptionType.STRING, "rostersheet", "Name of your roster sheet", true)
+                .addOption(OptionType.STRING, "arrestsheet", "Name of your arrest sheet", true));
+
 
         event.updateCommands().addCommands(commandData).queue();
     }
@@ -76,7 +85,13 @@ public class CommandManager extends ListenerAdapter {
                 event.reply("Schedule created").setEphemeral(true).queue();
                 break;
             case "setup":
-                SheetsSetup.setSpreadsheetId(event.getOption("spreadsheet").getAsString());
+                HashMap<String, String> values = SheetsSetup.getSheetValues();
+                values.put("spreadsheetid", event.getOption("spreadsheet").getAsString());
+                values.put("usernamecolumn", event.getOption("idcolumn").getAsString());
+                values.put("rankcolumn", event.getOption("rankcolumn").getAsString());
+                values.put("excusecolumn", event.getOption("excusecolumn").getAsString());
+                values.put("rostersheet", event.getOption("rostersheet").getAsString());
+                values.put("arrestsheet", event.getOption("arrestsheet").getAsString());
                 event.reply("Connection set up").setEphemeral(true).queue();
                 break;
             case "setupusers":
@@ -99,28 +114,28 @@ public class CommandManager extends ListenerAdapter {
         switch (event.getModalId()){
             case "arrestModal":
                 event.deferReply().setEphemeral(true).queue();
-                if (FunctionalityModals.writeArrestToRoster(event.getValues(), arrestCounter)){
+                if (WritingHandler.writeArrestToRoster(event.getValues(), arrestCounter)){
                     event.getChannel().sendMessageEmbeds(FunctionalityModals.createArrestAnswerEmbed(event.getValues())).queue();
-                    event.getHook().sendMessage("Twój areszt został przyjęty").queue();
+                    event.getHook().sendMessage("Arrest accepted").queue();
                 }
                 arrestCounter++;
                 break;
             case "ranksModal":
                 event.deferReply().setEphemeral(true).queue();
-                if (FunctionalityModals.writeRankToRoster(username, event.getValues())){
+                if (WritingHandler.writeRankToRoster(username, event.getValues())){
                     event.getChannel().sendMessageEmbeds(FunctionalityModals.createRanksAnswerEmbed(username, event.getValues())).queue();
-                    event.getHook().sendMessage("Twój stopień został zmieniony").queue();
+                    event.getHook().sendMessage("Rank changed").queue();
                 } else {
-                    event.reply("Wystąpił błąd").queue();
+                    event.reply("An error occurred").queue();
                 }
                 break;
             case "excusesModal":
                 event.deferReply().setEphemeral(true).queue();
-                if (FunctionalityModals.writeExcuseToRoster(username ,event.getValues())){
+                if (WritingHandler.writeExcuseToRoster(username,event.getValues())){
                     event.getChannel().sendMessageEmbeds(FunctionalityModals.createExcuseAnswerEmbed(username, event.getValues())).queue();
-                    event.getHook().sendMessage("Twoje zwolnienie zostało przyjęte").queue();
+                    event.getHook().sendMessage("Excuse accepted").queue();
                 } else {
-                    event.reply("Wystąpił błąd").queue();
+                    event.reply("An error occurred").queue();
                 }
                 break;
         }

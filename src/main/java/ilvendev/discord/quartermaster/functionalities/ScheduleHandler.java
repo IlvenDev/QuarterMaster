@@ -8,14 +8,14 @@ import java.util.LinkedHashMap;
 
 public class ScheduleHandler {
 
-    private static LinkedHashMap<String,String> daysInformations = new LinkedHashMap<>(){{
-        put("poniedziałek", "desc");
-        put("wtorek", "desc");
-        put("środa"," desc");
-        put("czwartek", "desc");
-        put("piątek", "desc");
-        put("sobota", "desc");
-        put("niedziela", "desc");
+    private static final LinkedHashMap<String,String> daysInformations = new LinkedHashMap<>(){{
+        put("monday", "");
+        put("tuesday", "");
+        put("wednesday","");
+        put("thursday", "");
+        put("friday", "");
+        put("saturday", "");
+        put("sunday", "");
     }};
 
     public static void updateDay(Message message, String day, String newDesc){

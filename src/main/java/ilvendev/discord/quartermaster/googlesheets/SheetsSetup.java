@@ -16,19 +16,24 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import java.io.*;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class SheetsSetup {
-    private static  String spreadsheetId = "";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
-    public static void setSpreadsheetId(String newSpreadsheetId) {
-        spreadsheetId = newSpreadsheetId;
-    }
+    private static HashMap<String, String> sheetValues = new HashMap<>(){{
+        put("usernamecolumn", "");
+        put("excusecolumn", "");
+        put("rostersheet", "");
+        put("arrestsheet", "");
+        put("spreadsheetid", "");
+        put("rankcolumn", "");
+    }};
 
-    public static String getSpreadsheetId() {
-        return spreadsheetId;
+    public static HashMap<String, String> getSheetValues() {
+        return sheetValues;
     }
 
     private static final List<String> SCOPES =
