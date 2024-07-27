@@ -1,9 +1,13 @@
 package ilvendev.discord.quartermaster.commands;
 
 import ilvendev.discord.quartermaster.functionalities.FunctionalityModals;
-import ilvendev.discord.quartermaster.functionalities.Schedule;
+import ilvendev.discord.quartermaster.functionalities.ScheduleHandler;
 import ilvendev.discord.quartermaster.googlesheets.SheetsSetup;
 import ilvendev.discord.quartermaster.userManagement.UserManager;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -12,40 +16,45 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.requests.RestAction;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class CommandManager extends ListenerAdapter {
     private static int arrestCounter = 2;
-    List<CommandData> commandData = new ArrayList<>();
 
-    private final HashMap<String, String> commands = new HashMap<String, String >() {{
-        put("arrest", "Open an arrest modal");
-        put("ranks", "Open a ranks modal");
-        put("excuses", "Open an excuses modal");
-        put("createschedule", "Create a new schedule embed");
-        put("setupusers", "Sets up rowNumber/User map");
-    }};
+    private void setupCommands(Guild event) {
+        List<CommandData> commandData = new ArrayList<>();
+        commandData.add((Commands.slash("arrest", "Open an arrest modal")));
+        commandData.add((Commands.slash("ranks", "Open a ranks modal")));
+        commandData.add((Commands.slash("excuses", "Open a excuses modal")));
+        commandData.add((Commands.slash("createschedule", "Create a new schedule")));
+        commandData.add((Commands.slash("changeschedule", "Change a day in the schedule"))
+                .addOptions(new OptionData(OptionType.STRING, "day", "Day which description to change")
+                        .addChoice("Poniedziałek", "poniedziałek")
+                        .addChoice("Wtorek", "wtorek")
+                        .addChoice("Środa", "środa")
+                        .addChoice("Czwartek", "czwartek")
+                        .addChoice("Piątek", "piątek"))
+                        .addOption(OptionType.STRING, "description", "New day description"));
+        commandData.add((Commands.slash("setupusers", "Sets up user data")));
+        commandData.add(Commands.slash("setup", "Sets up sheets to discord connection")
+                .addOption(OptionType.STRING, "spreadsheet", "ID of your spreadsheet", true));
+
+        event.updateCommands().addCommands(commandData).queue();
+    }
 
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
-        commands.forEach((name, description) -> {
-            commandData.add(Commands.slash(name, description));
-        });
-        commandData.add(Commands.slash("setup", "Sets up sheets to discord connection")
-                .addOption(OptionType.STRING, "spreadsheet", "ID of your spreadsheet", true));
-        event.getGuild().updateCommands().addCommands(commandData).queue();
+        setupCommands(event.getGuild());
     }
 
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
-        commands.forEach((name, description) -> {
-            commandData.add(Commands.slash(name, description));
-        });
-        commandData.add(Commands.slash("setup", "Sets up sheets to discord connection")
-                .addOption(OptionType.STRING, "spreadsheet", "ID of your spreadsheet", true));
-        event.getGuild().updateCommands().addCommands(commandData).queue();
+        setupCommands(event.getGuild());
     }
 
     @Override
@@ -62,8 +71,8 @@ public class CommandManager extends ListenerAdapter {
                 event.replyModal(FunctionalityModals.createExcusesModal()).queue();
                 break;
             case "createschedule":
-                Schedule schedule = new Schedule();
-                event.getChannel().sendMessageEmbeds(schedule.createScheduleEmbed()).queue();
+                MessageEmbed embed = ScheduleHandler.createScheduleEmbed();
+                event.getChannel().sendMessageEmbeds(embed).queue();
                 event.reply("Schedule created").setEphemeral(true).queue();
                 break;
             case "setup":
@@ -75,6 +84,12 @@ public class CommandManager extends ListenerAdapter {
                 UserManager.setupUsers(event.getGuild().getMembers());
                 event.getHook().sendMessage("Users set up").queue();
                 break;
+            case "changeschedule":
+                MessageChannelUnion channel = event.getChannel();
+                RestAction<Message> action = channel.retrieveMessageById(channel.getLatestMessageId());
+                Message message = action.complete();
+                ScheduleHandler.updateDay(message, event.getOption("day").getAsString(), event.getOption("description").getAsString());
+                event.reply("Schedule changed").setEphemeral(true).queue();
         }
     }
 

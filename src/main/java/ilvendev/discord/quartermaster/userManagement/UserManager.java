@@ -7,7 +7,7 @@ import java.util.List;
 
 
 public class UserManager {
-    private static final HashMap<String, String> users = new HashMap<String , String>();
+    private static final HashMap<String, String> users = new HashMap<>();
 
     public static void setupUsers(List<Member> members){
         String column = SearchHandler.findColumnByName("Nick DC", "A1:L1");
@@ -17,6 +17,5 @@ public class UserManager {
                 users.put(member.getUser().getName(), rowNumber);
             }
         }
-        System.out.println(users);
     }
 }
