@@ -42,7 +42,7 @@ public class CommandManager extends ListenerAdapter {
                         .addChoice("Friday", "friday")
                         .addChoice("Saturday", "saturday")
                         .addChoice("Sunday", "sunday"))
-                        .addOption(OptionType.STRING, "description", "New day description"));
+                .addOption(OptionType.STRING, "description", "New day description"));
         commandData.add((Commands.slash("setupusers", "Sets up user data")));
         commandData.add(Commands.slash("setup", "Sets up sheets to discord connection")
                 .addOption(OptionType.STRING, "spreadsheet", "ID of your spreadsheet", true)
@@ -86,12 +86,11 @@ public class CommandManager extends ListenerAdapter {
                 break;
             case "setup":
                 HashMap<String, String> values = SheetsSetup.getSheetValues();
-                values.put("spreadsheetid", event.getOption("spreadsheet").getAsString());
-                values.put("usernamecolumn", event.getOption("idcolumn").getAsString());
-                values.put("rankcolumn", event.getOption("rankcolumn").getAsString());
-                values.put("excusecolumn", event.getOption("excusecolumn").getAsString());
-                values.put("rostersheet", event.getOption("rostersheet").getAsString());
-                values.put("arrestsheet", event.getOption("arrestsheet").getAsString());
+                for (int i = 0; i <= event.getOptions().size(); i++) {
+                    values.put(event.getOptions().get(i).getName(), event.getOptions().get(i).getAsString());
+                    System.out.println(event.getOptions().get(i).getName());
+                    System.out.println(event.getOptions().get(i).getAsString());
+                }
                 event.reply("Connection set up").setEphemeral(true).queue();
                 break;
             case "setupusers":

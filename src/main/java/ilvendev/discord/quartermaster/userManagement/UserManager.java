@@ -6,11 +6,10 @@ import net.dv8tion.jda.api.entities.Member;
 import java.util.HashMap;
 import java.util.List;
 
-
 public class UserManager {
     private static final HashMap<String, String> users = new HashMap<>();
     public static void setupUsers(List<Member> members){
-        String range = SheetsSetup.getSheetValues().get("rostersheet")+"!"+SheetsSetup.getSheetValues().get("usernamecolumn")+"2:"+SheetsSetup.getSheetValues().get("usernamecolumn");
+        String range = SheetsSetup.getSheetValues().get("rostersheet")+"!"+SheetsSetup.getSheetValues().get("idcolumn")+"2:"+SheetsSetup.getSheetValues().get("idcolumn");
         for(Member member : members){
             String rowNumber = SearchHandler.findRowNumberByName(member.getUser().getName(), range);
             if(!rowNumber.isEmpty()){

@@ -9,7 +9,7 @@ public class SearchHandler {
         try {
             Sheets service = SheetsSetup.createSheetsService("Row number finder");
             List<Object> values = service.spreadsheets().values()
-                    .get(SheetsSetup.getSheetValues().get("spreadsheetid"), range)
+                    .get(SheetsSetup.getSheetValues().get("spreadsheet"), range)
                     .setMajorDimension("COLUMNS")
                     .execute()
                     .getValues()

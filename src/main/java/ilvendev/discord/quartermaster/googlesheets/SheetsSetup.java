@@ -24,11 +24,11 @@ public class SheetsSetup {
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
     private static HashMap<String, String> sheetValues = new HashMap<>(){{
-        put("usernamecolumn", "");
+        put("idcolumn", "");
         put("excusecolumn", "");
         put("rostersheet", "");
         put("arrestsheet", "");
-        put("spreadsheetid", "");
+        put("spreadsheet", "");
         put("rankcolumn", "");
     }};
 
@@ -59,11 +59,11 @@ public class SheetsSetup {
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("Dev");
     }
 
-    public static Sheets createSheetsService(String APPLICATION_NAME) throws GeneralSecurityException, IOException, Exception {
+    public static Sheets createSheetsService(String APPLICATION_NAME) throws Exception {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         return new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
-    };
+    }
 }
 

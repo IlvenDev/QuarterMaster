@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class WritingHandler { ;
+public class WritingHandler {
     public static void updateSheet(List<Object> newValue, String range) {
         ValueRange valueRange = new ValueRange()
                 .setValues(Collections.singletonList(newValue));
         try {
             Sheets service = SheetsSetup.createSheetsService("Writer");
-            service.spreadsheets().values().update(SheetsSetup.getSheetValues().get("spreadsheetid"), range, valueRange)
+            service.spreadsheets().values().update(SheetsSetup.getSheetValues().get("spreadsheet"), range, valueRange)
                     .setValueInputOption("RAW")
                     .execute();
 
